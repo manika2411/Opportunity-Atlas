@@ -1,8 +1,11 @@
-import axios from "axios"
+export const fetchOpportunities = async (filters = {}) => {
+  const params = new URLSearchParams(filters).toString();
 
-const API_BASE = "http://localhost:5000/api/opportunities"
+  const res = await fetch(
+    `http://localhost:5000/api/opportunities?${params}`
+  );
 
-export const fetchOpportunities = async () => {
-  const response = await axios.get(API_BASE)
-  return response.data
-}
+  if (!res.ok) throw new Error("Failed to fetch opportunities");
+  return res.json();
+};
+
