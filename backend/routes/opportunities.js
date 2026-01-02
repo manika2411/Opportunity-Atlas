@@ -3,15 +3,31 @@ import Opportunity from "../models/Opportunity.js";
 
 const router=express.Router()
 
-router.get("/", async(req,res)=>{
-    try{
-        const opportunities=await Opportunity.find()
-        res.status(200).json(opportunities)
+router.get("/", async (req, res) => {
+  try {
+    const { type, location, sort } = req.query;
+
+    let filter = {};
+    if (type) filter.type = type;
+    if (location) filter.location = location;
+
+    let query = Opportunity.find(filter);
+
+    if (sort === "deadline") {
+      query = query.sort({ deadline: 1 });
     }
-    catch(error){
-        res.status(500).json({message:"Failed to fetch opportunities"})
+
+    if (sort === "recent") {
+      query = query.sort({ createdAt: -1 });
     }
-})
+
+    const opportunities = await query;
+    res.status(200).json(opportunities);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch opportunities" });
+  }
+});
+
 
 router.post("/", async(req,res)=>{
     try{
